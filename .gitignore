@@ -1,0 +1,24 @@
+# IDE http Client
+*.http
+
+# Dotenv
+.env
+.env.*
+!.env.example
+
+.DS_Store
+.vscode
+node_modules
+npm-debug.log
+*.sublime-project
+*.sublime-workspace
+.eslintcache
+.idea
+newrelic_agent.log
+npm-debug.log
+yarn.lock
+ms-response-time.txt
+package-lock.json
+
+___*.*
+
