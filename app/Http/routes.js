@@ -7,6 +7,9 @@ const app = express();
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
+const compression = require('compression');
+app.use(compression());
+
 if (env.get('HTTP_DEBUGMODE', false)) {
   logger.info('MorganBody Debug enabled');
 
@@ -44,14 +47,10 @@ app.use((err, req, resp, next) => {
 
   if (err instanceof GenericUserError) {
     payload = { code: 400, msg: err.message };
-  } else if (err instanceof ForbiddenResourceError) {
-    payload = { code: 403, msg: err.message };
   } else if (err instanceof EntityNotFoundError) {
     payload = { code: 404, msg: err.message ? err.message : "Entity not found" };
   } else if (err instanceof InputDataError) {
     payload = { code: 400, msg: "Missing fields: " + err.message };
-  } else if (err instanceof Error.ValidationError) {
-    payload = { code: 400, msg: err.message };
   }
 
   else if (err instanceof ServiceError && err.code) {

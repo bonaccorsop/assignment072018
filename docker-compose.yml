@@ -1,12 +1,9 @@
 version: '3'
 
-networks:
-  default:
-    external:
-      name: common
-
 services:
-  kontact:
+
+  app:
+
     build:
       context: .
       args:
@@ -21,3 +18,8 @@ services:
     env_file: .env
 
     command: "pm2-runtime index.js --watch"
+
+
+  mongodb:
+
+    image: "mongo:latest"

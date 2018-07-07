@@ -70,6 +70,7 @@ module.exports = class MongoRepository {
      * @return Observable<Boolean>
      */
     this.write$ = (modelName, data, populate) => {
+
       let Model = this.schemas.getModel(modelName);
       let model = new Model(data);
       return this.Rx.Observable.defer(() => model.save())

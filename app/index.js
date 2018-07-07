@@ -8,13 +8,13 @@ const port = deps.env.get('HTTP_PORT');
 
 Observable.of(1)
 
-  // //start mongo
-  // .flatMap(() => Observable.fromPromise(deps.mongoose.connect(deps.env.get('MONGO_CONNECTION'))))
-  // .do(conn => deps.logger.info(`# Mongo connection entablished with ${conn.host} √`))
+  //start mongo
+  .flatMap(() => Observable.fromPromise(deps.mongoose.connect(deps.env.get('MONGO_CONNECTION'))))
+  .do(conn => deps.logger.info(`# Mongo connection entablished with ${conn.host} √`))
 
-  // //load schemas
-  // .flatMap(() => Observable.fromPromise(deps.schemas.setUp()))
-  // .do(deps.logger.info(`# Repository Schemas loaded √`))
+  //load schemas
+  .flatMap(() => Observable.fromPromise(deps.schemas.setUp()))
+  .do(deps.logger.info(`# Repository Schemas loaded √`))
 
   .flatMap(() => Observable.fromPromise(require(CWD + '/Http/routes.js').listen(port))
   .do(deps.logger.info(`# App HTTPService is running on port: ${port}, you can curl it! √`)))
