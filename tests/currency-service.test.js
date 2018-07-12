@@ -16,11 +16,11 @@ const InvalidParametersError = require('../app/Errors/InvalidParametersError');
 // Tests
 // ------------------
 
-test('should throw exception if fromCurrency or value is not fill', done => {
+test('should throw exception if fromCurrency or amount is not fill', done => {
 
   const currencyService = new CurrencyService({}, {}, mockedTransactionRepository);
 
-  currencyService.exchange$({ value: 12.3, toCurrency: 'EUR' })
+  currencyService.exchange$({ amount: 12.3, toCurrency: 'EUR' })
     .toPromise()
     .catch(e => {
       expect(e instanceof InvalidParametersError).toBeTruthy();
@@ -38,46 +38,36 @@ test('should throw exception if fromCurrency or value is not fill', done => {
 
 
 
-test('should call the ECB Client with choosen currency', done => {
+test('should call the ECB Client ONCE with choosen currency', done => {
+
+  let mockedEcbClient = { getEuroCurrencyRate: jest.fn(currency => Promise.resolve(0)) };
+  const currencyService = new CurrencyService({}, mockedEcbClient, mockedTransactionRepository);
+
+  currencyService.exchange$({ fromCurrency: 'USD', amount: 12.3, toCurrency: 'EUR' })
+    .toPromise()
+    .then(e => {
+      // expecting that is called once with value USD (EURO must be skipped)
+      expect(mockedEcbClient.getEuroCurrencyRate.mock.calls.length).toBe(1);
+      expect(mockedEcbClient.getEuroCurrencyRate.mock.calls[0][0]).toBe('USD');
+      done();
+    });
+});
+
+
+test('should call the ECB Client TWICE with choosen currency', done => {
 
   const mockedEcbClient = { getEuroCurrencyRate: jest.fn(currency => Promise.resolve(0)) };
   const currencyService = new CurrencyService({}, mockedEcbClient, mockedTransactionRepository);
 
-  currencyService.exchange$({ fromCurrency: 'USD', value: 12.3, toCurrency: 'EUR' })
+  currencyService.exchange$({ fromCurrency: 'USD', amount: 12.3, toCurrency: 'JPY' })
     .toPromise()
     .then(e => {
-      expect(mockedEcbClient.getEuroCurrencyRate).toHaveBeenCalledWith('USD');
+      // expecting that is called twice
+      expect(mockedEcbClient.getEuroCurrencyRate.mock.calls.length).toBe(2);
+      expect(mockedEcbClient.getEuroCurrencyRate.mock.calls[0][0]).toBe('JPY');
+      expect(mockedEcbClient.getEuroCurrencyRate.mock.calls[1][0]).toBe('USD');
       done();
     });
 });
 
 
-test('should exchange currency with right output values', done => {
-
-  let currencyService = new CurrencyService({}, { getEuroCurrencyRate: jest.fn(currency => Promise.resolve(1.1724)) }, mockedTransactionRepository);
-  currencyService.exchange$({ fromCurrency: 'USD', value: 12.32, toCurrency: 'EUR' })
-    .toPromise()
-    .then(out => {
-      expect(out).toBeCloseTo(10.51);
-      done();
-    });
-
-    currencyService = new CurrencyService({}, { getEuroCurrencyRate: jest.fn(currency => Promise.resolve(129.65)) }, mockedTransactionRepository);
-    currencyService.exchange$({ fromCurrency: 'JPY', value: 13.02, toCurrency: 'EUR' })
-      .toPromise()
-      .then(out => {
-        expect(out).toBeCloseTo(0.10);
-        done();
-      });
-
-      currencyService = new CurrencyService({}, { getEuroCurrencyRate: jest.fn(currency => Promise.resolve(129.65)) }, mockedTransactionRepository);
-      currencyService.exchange$({ fromCurrency: 'JPY', value: 13.02, toCurrency: 'EUR' })
-        .toPromise()
-        .then(out => {
-          expect(out).not.toBeCloseTo(0.14);
-          done();
-        });
-
-
-
-});

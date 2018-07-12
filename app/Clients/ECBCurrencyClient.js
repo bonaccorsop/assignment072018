@@ -15,9 +15,14 @@ module.exports = class ECBCurrencyClient extends HTTPClient {
     return this.performGetRequest(url, {
       headers: { 'Accept': 'application/vnd.sdmx.data+json;version=1.0.0-wd' }
     })
+
+    .catch(err => {throw new Error(err)})
+
     .then(resp => resp.body)
     .then(body => JSON.parse(body))
     .then(data => parseFloat(data.dataSets[0]['series']['0:0:0:0:0']['observations']['0'][0]) )
+
+
 
   }
 

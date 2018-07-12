@@ -9,13 +9,13 @@ module.exports = class CurrencyController extends BaseController {
     super();
 
     // Exchange method
-    this.router.get('/v1/exchange/:fromCurrency/:value/:toCurrency?', (req, resp, next) => {
+    this.router.get('/v1/exchange/:amount/:fromCurrency/:toCurrency', (req, resp, next) => {
       transactionService.exchange$({
         fromCurrency: req.params.fromCurrency,
-        value: req.params.value,
         toCurrency: req.params.toCurrency,
+        amount: parseFloat(req.params.amount),
       })
-      .subscribe(output => { resp.status(200).send(output) }, err => { next(err); });
+      .subscribe(payload => { resp.status(200).send(payload) }, err => { next(err); });
     });
 
   }

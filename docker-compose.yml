@@ -7,19 +7,18 @@ services:
     build:
       context: .
       args:
-        buildenv: local
+        buildenv: prod
 
     ports:
       - "8080:8080"
 
-    volumes:
-      - ./:/code
-
-    env_file: .env
-
-    command: "pm2-runtime index.js --watch"
+    environment:
+      NODE_ENV: production
+      HTTP_PORT: 8080
+      HTTP_DEBUGMODE: "false"
+      APP_URL: http://localhost:8080
+      MONGO_CONNECTION: mongodb://mongodb:27017/currency
 
 
   mongodb:
-
     image: "mongo:latest"

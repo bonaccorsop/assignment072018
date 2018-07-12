@@ -4,7 +4,7 @@ const { Schema } = require('mongoose');
 
 const currencySchema = Schema({
   currency: { type: String, required: true },
-  value: { type: Number, required: true }
+  amount: { type: Number, required: true }
 }, { _id: false });
 
 module.exports = Schema({
